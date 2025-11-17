@@ -14,16 +14,8 @@
 	<version>0.0.1</version>
 
 	<properties>
-		<java.version>25</java.version>
+		<java.version>17</java.version>
 	</properties>
-
-	<repositories>
-        <repository>
-            <id>github</id>
-            <name>GitHub Packages</name>
-            <url>https://maven.pkg.github.com/doda25-team11/lib-version</url>
-        </repository>
-    </repositories>
 
 	<dependencies>
 		<dependency>
@@ -38,7 +30,7 @@
 		<dependency>
 			<groupId>com.doda25.team11</groupId>
 			<artifactId>lib-version</artifactId>
-			<version>1.0.2</version>
+			<version>1.0.3</version>
 		</dependency>
 
 		<dependency>
