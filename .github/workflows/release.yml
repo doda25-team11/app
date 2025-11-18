@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - f8 #test
     paths-ignore:
       - '**.md'
       - '.gitignore'
