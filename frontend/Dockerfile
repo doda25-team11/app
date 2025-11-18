@@ -7,11 +7,10 @@ COPY src ./src
 
 RUN mvn clean package -DskipTests
 
-EXPOSE APP_PORT = 8080
+ENV MODEL_SERVICE_PORT=8081
+ENV MODEL_SERVICE_URL=http://localhost:${MODEL_SERVICE_PORT}
 
-ENV MODEL_SERVICE_URL = http://localhost:8081
-
-EXPOSE ${APP_PORT}
+EXPOSE 8080
 
 # Run the compiled Jar file when the container starts
 ENTRYPOINT ["java", "-jar", "/app/target/frontend-0.0.1.jar"]
