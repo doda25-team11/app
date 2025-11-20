@@ -22,5 +22,5 @@ Then, run the docker image on port 8080.
 $ docker run -p 8080:8080 app
 
 If you wish to run it on another port, do:
-$ docker run -e MODEL_SERVICE_PORT=9000 -p 8080:8080 app
-So this listens on port 9000.
+$ docker run --env APP_PORT=3000 --env MODEL_SERVICE_PORT=9000 -p 3000:3000 app
+So here the frontend listens on port 3000 and the backend listens on port 9000
