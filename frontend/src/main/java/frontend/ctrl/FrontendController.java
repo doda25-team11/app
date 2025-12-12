@@ -20,6 +20,27 @@ import jakarta.servlet.http.HttpServletRequest;
 @RequestMapping(path = "/sms")
 public class FrontendController {
 
+    // Monitoring ==========
+    private final MeterRegistry meterRegistry;
+
+    // Gauge: current in-flight classification requests
+    private final AtomicInteger inFlightRequests;
+
+    public FrontendController(MeterRegistry meterRegistry) {
+        this.meterRegistry = meterRegistry;
+
+        this.inFlightRequests = Gauge.builder(
+                "sms_checker_in_flight_requests",
+                new AtomicInteger(0),
+                AtomicInteger::get
+        )
+        .description("Current number of SMS classification requests being processed")
+        .tag("component", "model-service")
+        .register(meterRegistry);
+    }
+
+    // =====================
+
     private String modelHost;
 
     private RestTemplateBuilder rest;
@@ -67,12 +88,60 @@ public class FrontendController {
     }
 
     private String getPrediction(Sms sms) {
+        // Counter: user initiated classification
+        meterRegistry.counter(
+                "sms_checker_actions_total",
+                "action", "classify",
+                "result", "started",
+                "channel", "api"
+        ).increment();
+
+        // Gauge increment (request started)
+        inFlightRequests.incrementAndGet();
+
+        // Histogram / Timer for latency
+        Timer.Sample sample = Timer.start(meterRegistry);
+
         try {
             var url = new URI(modelHost + "/predict");
-            var c = rest.build().postForEntity(url, sms, Sms.class);
-            return c.getBody().result.trim();
-        } catch (URISyntaxException e) {
+            var response = rest.build().postForEntity(url, sms, Sms.class);
+
+            // Counter: success
+            meterRegistry.counter(
+                    "sms_checker_actions_total",
+                    "action", "classify",
+                    "result", "ok",
+                    "channel", "api"
+            ).increment();
+
+            return response.getBody().result.trim();
+
+        } catch (Exception e) {
+
+            // Counter: failure
+            meterRegistry.counter(
+                    "sms_checker_actions_total",
+                    "action", "classify",
+                    "result", "error",
+                    "channel", "api"
+            ).increment();
+
             throw new RuntimeException(e);
+
+        } finally {
+            // Stop timer and record histogram
+            sample.stop(
+                    Timer.builder("sms_checker_classify_latency_seconds")
+                            .description("Latency of SMS spam classification")
+                            .publishPercentileHistogram()
+                            .tag("channel", "api")
+                            .tag("model_version", "current")
+                            .register(meterRegistry)
+            );
+
+            // Gauge decrement (request finished)
+            inFlightRequests.decrementAndGet();
         }
     }
+
 }
