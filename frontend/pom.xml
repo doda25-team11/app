@@ -14,7 +14,7 @@
 	<version>0.0.1</version>
 
 	<properties>
-		<java.version>25</java.version>
+		<java.version>17</java.version>
 	</properties>
 
 	<dependencies>
@@ -32,6 +32,19 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+<!-- For Prometheus -->
+
+  		<dependency>
+    		<groupId>org.springframework.boot</groupId>
+    		<artifactId>spring-boot-starter-actuator</artifactId>
+  		</dependency>
+
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-registry-prometheus</artifactId>
+		</dependency>
+		
 	</dependencies>
 
 	<build>
