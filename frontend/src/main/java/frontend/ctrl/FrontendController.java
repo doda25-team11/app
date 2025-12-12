@@ -1,7 +1,7 @@
 package frontend.ctrl;
 
 import java.net.URI;
-import java.net.URISyntaxException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.env.Environment;
@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import frontend.data.Sms;
+import io.micrometer.core.instrument.Gauge;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
@@ -24,20 +27,7 @@ public class FrontendController {
     private final MeterRegistry meterRegistry;
 
     // Gauge: current in-flight classification requests
-    private final AtomicInteger inFlightRequests;
-
-    public FrontendController(MeterRegistry meterRegistry) {
-        this.meterRegistry = meterRegistry;
-
-        this.inFlightRequests = Gauge.builder(
-                "sms_checker_in_flight_requests",
-                new AtomicInteger(0),
-                AtomicInteger::get
-        )
-        .description("Current number of SMS classification requests being processed")
-        .tag("component", "model-service")
-        .register(meterRegistry);
-    }
+    private final AtomicInteger inFlightRequests = new AtomicInteger(0);
 
     // =====================
 
@@ -45,10 +35,20 @@ public class FrontendController {
 
     private RestTemplateBuilder rest;
 
-    public FrontendController(RestTemplateBuilder rest, Environment env) {
+    public FrontendController(RestTemplateBuilder rest, Environment env, MeterRegistry meterRegistry) {
         this.rest = rest;
         this.modelHost = env.getProperty("MODEL_HOST");
+        this.meterRegistry = meterRegistry;
         assertModelHost();
+
+        Gauge.builder(
+                "sms_checker_in_flight_requests",
+                inFlightRequests,
+                AtomicInteger::get
+        )
+        .description("Current number of SMS classification requests being processed")
+        .tag("component", "model-service")
+        .register(meterRegistry);
     }
 
     private void assertModelHost() {
