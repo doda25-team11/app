@@ -73,7 +73,8 @@ public class FrontendController {
     }
 
     @GetMapping("/")
-    public String index(Model m) {
+    public String index(Model m, HttpServletRequest req) {
+        req.getSession(true);
         m.addAttribute("hostname", modelHost);
         return "sms/index";
     }
