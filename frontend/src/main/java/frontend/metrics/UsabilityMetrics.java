@@ -22,15 +22,15 @@ public class UsabilityMetrics implements MeterBinder {
                 .register(registry);
 
         // Counter: actions
-        // Histogram/Timer: classification latency
-        classifyLatency = Timer.builder("sms_checker_classify_latency_seconds")
-                .description("Time spent classifying a message")
-                .publishPercentileHistogram() 
-                .tag("channel", "ui")         
-                .tag("model_version", "unknown")
-                .register(registry);
+        // // Histogram/Timer: classification latency
+        // classifyLatency = Timer.builder("sms_checker_classify_latency_seconds")
+        //         .description("Time spent classifying a message")
+        //         .publishPercentileHistogram() 
+        //         .tag("channel", "ui")         
+        //         .tag("model_version", "unknown")
+        //         .register(registry);
 
-        // A “base” counter just to ensure metric exists (optional)
+        // A “base” counter just to ensure metric exists 
         actionsTotal = Counter.builder("sms_checker_actions_total")
                 .description("Total user actions in the SMS checker")
                 .tag("action", "init")
