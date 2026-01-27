@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - prometheus_custom_endpoint
     paths-ignore:
       - '**.md'
       - '.gitignore'
