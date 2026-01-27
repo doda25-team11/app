@@ -39,7 +39,7 @@ public class MetricsEndpoint {
     double v = (g == null) ? 0.0 : g.value();
     sb.append("# HELP ").append(name).append(" ").append(help).append("\n");
     sb.append("# TYPE ").append(name).append(" gauge\n");
-    sb.append(name).append(" ").append(v == null ? 0.0 : v).append("\n");
+    sb.append(name).append(" ").append(v).append("\n");
   }
 
   private void renderCounters(StringBuilder sb, String name, String help) {
