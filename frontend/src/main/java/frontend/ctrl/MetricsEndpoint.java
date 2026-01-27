@@ -1,4 +1,4 @@
-package frontend.ctrl
+package frontend.ctrl;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Meter;
