@@ -5,6 +5,7 @@ import io.micrometer.core.instrument.binder.MeterBinder;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import java.time.Duration;
 
 @Component
 public class UsabilityMetrics implements MeterBinder {
@@ -54,6 +55,15 @@ public class UsabilityMetrics implements MeterBinder {
         Timer timer = Timer.builder("sms_checker_classify_latency_seconds")
                 .description("Time spent classifying a message")
                 .publishPercentileHistogram()
+	        .serviceLevelObjectives(
+                   Duration.ofMillis(10),
+                   Duration.ofMillis(25),
+                   Duration.ofMillis(50),
+                   Duration.ofMillis(100),
+                   Duration.ofMillis(250),
+                   Duration.ofMillis(500),
+                   Duration.ofSeconds(1)
+                )
                 .tag("channel", channel)
                 .tag("model_version", modelVersion)
                 .register(registry);
