@@ -29,7 +29,8 @@ public class MetricsEndpoint {
     renderCounters(sb, "sms_checker_actions_total", "Total user actions in the SMS checker");
     sb.append("\n");
 
-    renderTimersAsCountSum(sb, "sms_checker_classify_latency_seconds", "Time spent classifying a message");
+    renderTimers(sb, "sms_checker_classify_latency_seconds", "Time spent classifying a message");
+   
 
     return sb.toString();
   }
