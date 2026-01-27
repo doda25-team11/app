@@ -88,7 +88,7 @@ public class MetricsEndpoint {
 
       // +Inf bucket == total count
       sb.append(name).append("_bucket")
-        .append(formatTagsWithExtra(m, "le", "+Inf"))
+        .append(formatTagsHisto(m, "le", "+Inf"))
         .append(" ")
         .append(t.count())
         .append("\n");
