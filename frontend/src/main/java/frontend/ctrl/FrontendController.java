@@ -23,7 +23,7 @@ import jakarta.servlet.http.HttpServletRequest;
 @RequestMapping(path = "/sms")
 public class FrontendController {
 
-    // Monitoring ========
+    // Monitoring ==========
     private final MeterRegistry meterRegistry;
 
     // Gauge: current in-flight classification requests
