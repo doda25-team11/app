@@ -14,7 +14,7 @@ public class MetricsEndpoint {
 
   private final MeterRegistry registry;
 
-  public CustomMetricsEndpoint(MeterRegistry registry) {
+  public MetricsEndpoint(MeterRegistry registry) {
     this.registry = registry;
   }
 
@@ -28,7 +28,6 @@ public class MetricsEndpoint {
     renderCounters(sb, "sms_checker_actions_total", "Total user actions in the SMS checker");
     sb.append("\n");
 
-    // For timers: emit count + sum (simple, correct). Buckets are possible but more complex.
     renderTimersAsCountSum(sb, "sms_checker_classify_latency_seconds", "Time spent classifying a message");
 
     return sb.toString();
