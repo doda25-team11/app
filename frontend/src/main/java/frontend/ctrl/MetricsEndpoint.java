@@ -2,6 +2,7 @@ import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Meter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
+import io.micrometer.core.instrument.Gauge;
 
 import java.util.concurrent.TimeUnit;
 
@@ -34,7 +35,8 @@ public class MetricsEndpoint {
   }
 
   private void renderGauge(StringBuilder sb, String name, String help) {
-    Double v = registry.find(name).gaugeValue();
+    Gauge g = registry.find(name).gauge();
+    double v = (g == null) ? 0.0 : g.value();
     sb.append("# HELP ").append(name).append(" ").append(help).append("\n");
     sb.append("# TYPE ").append(name).append(" gauge\n");
     sb.append(name).append(" ").append(v == null ? 0.0 : v).append("\n");
