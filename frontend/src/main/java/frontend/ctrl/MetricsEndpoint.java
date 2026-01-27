@@ -66,13 +66,14 @@ public class MetricsEndpoint {
     for (Meter m : registry.find(name).meters()) {
       Timer t = (Timer) m;
 
-      if (!(t instanceof HistogramSupport hs)) {
+      if (!(t instanceof HistogramSupport)) {
      
         sb.append(name).append("_count").append(formatTags(m)).append(" ").append(t.count()).append("\n");
         sb.append(name).append("_sum").append(formatTags(m)).append(" ").append(t.totalTime(TimeUnit.SECONDS)).append("\n");
         continue;
       }
 
+      HistogramSupport hs = (HistogramSupport) t;
       HistogramSnapshot snap = hs.takeSnapshot();
 
    
