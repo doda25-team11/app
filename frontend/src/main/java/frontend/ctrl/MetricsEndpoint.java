@@ -1,0 +1,68 @@
+@RestController
+public class CustomMetricsEndpoint {
+
+  private final MeterRegistry registry;
+
+  public CustomMetricsEndpoint(MeterRegistry registry) {
+    this.registry = registry;
+  }
+
+  @GetMapping(value = "/metrics", produces = "text/plain; version=0.0.4; charset=utf-8")
+  public String metrics() {
+    StringBuilder sb = new StringBuilder();
+
+    renderGauge(sb, "sms_checker_active_sessions", "Current number of active user sessions (approx)");
+    sb.append("\n");
+
+    renderCounters(sb, "sms_checker_actions_total", "Total user actions in the SMS checker");
+    sb.append("\n");
+
+    // For timers: emit count + sum (simple, correct). Buckets are possible but more complex.
+    renderTimersAsCountSum(sb, "sms_checker_classify_latency_seconds", "Time spent classifying a message");
+
+    return sb.toString();
+  }
+
+  private void renderGauge(StringBuilder sb, String name, String help) {
+    Double v = registry.find(name).gaugeValue();
+    sb.append("# HELP ").append(name).append(" ").append(help).append("\n");
+    sb.append("# TYPE ").append(name).append(" gauge\n");
+    sb.append(name).append(" ").append(v == null ? 0.0 : v).append("\n");
+  }
+
+  private void renderCounters(StringBuilder sb, String name, String help) {
+    sb.append("# HELP ").append(name).append(" ").append(help).append("\n");
+    sb.append("# TYPE ").append(name).append(" counter\n");
+    for (Meter m : registry.find(name).meters()) {
+      Counter c = (Counter) m;
+      sb.append(name).append(formatTags(m)).append(" ").append(c.count()).append("\n");
+    }
+  }
+
+  private void renderTimers(StringBuilder sb, String name, String help) {
+    sb.append("# HELP ").append(name).append(" ").append(help).append("\n");
+    sb.append("# TYPE ").append(name).append(" summary\n");
+    for (Meter m : registry.find(name).meters()) {
+      Timer t = (Timer) m;
+      sb.append(name).append("_count").append(formatTags(m)).append(" ").append(t.count()).append("\n");
+      sb.append(name).append("_sum").append(formatTags(m)).append(" ").append(t.totalTime(TimeUnit.SECONDS)).append("\n");
+    }
+  }
+
+  private static String formatTags(Meter m) {
+    if (m.getId().getTags().isEmpty()) return "";
+    StringBuilder sb = new StringBuilder("{");
+    for (int i = 0; i < m.getId().getTags().size(); i++) {
+      var t = m.getId().getTags().get(i);
+      if (i > 0) sb.append(",");
+      sb.append(t.getKey()).append("=\"").append(escape(t.getValue())).append("\"");
+    }
+    sb.append("}");
+    return sb.toString();
+  }
+
+  private static String escape(String v) {
+    return v.replace("\\", "\\\\").replace("\"", "\\\"");
+  }
+}
+
