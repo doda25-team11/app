@@ -1,5 +1,16 @@
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.Meter;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
+
+import java.util.concurrent.TimeUnit;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+
 @RestController
-public class CustomMetricsEndpoint {
+public class MetricsEndpoint {
 
   private final MeterRegistry registry;
 
